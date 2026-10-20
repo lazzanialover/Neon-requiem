@@ -1,0 +1,40 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NEON REQUIEM — Roy animation lab</title><style>html,body{margin:0;height:100%;overflow:hidden;background:#070d15;color:#d6fff0;font:13px system-ui}canvas{width:100%;height:100%;display:block}#panel{position:fixed;left:16px;top:16px;padding:15px 18px;background:#07111ce8;border:1px solid #327b79;border-radius:8px;max-width:330px;line-height:1.65}b{color:#76ffd3}#mobile{position:fixed;bottom:20px;left:20px;display:none;gap:8px}#mobile button{font-size:26px;background:#0b2935b8;color:#aef;border:1px solid #438a95;padding:12px;border-radius:9px}@media(pointer:coarse){#mobile{display:flex}}#panel small{opacity:.75}</style></head><body><canvas id="c"></canvas><div id="panel"><b>NEON REQUIEM // ROY MOTION LAB 2.5</b><div>WASD — ходьба • Shift — бег<br>Мышь — направление взгляда<br>Пробел — рывок • R — сброс позиции</div><small>Новый независимый прототип героя: 8 направлений, отдельные руки/ноги, поворот корпуса, инерция и ткань плаща.</small></div><div id="mobile"><button data-k="a">◀</button><button data-k="w">▲</button><button data-k="s">▼</button><button data-k="d">▶</button></div><script>
+const cv=document.getElementById('c'),g=cv.getContext('2d');let W=0,H=0,D=1,t=0,last=performance.now(),keys={},mouse={x:0,y:0,active:false};let p={x:0,y:0,vx:0,vy:0,angle:0,face:0,stride:0,coat:0,dash:0,lean:0,blink:0};
+function resize(){D=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*D;cv.height=H*D;g.setTransform(D,0,0,D,0,0);if(!p.x){p.x=W*.5;p.y=H*.55;mouse.x=p.x+100;mouse.y=p.y}}addEventListener('resize',resize);resize();
+addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if([' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key))e.preventDefault();if(e.key.toLowerCase()==='r'){p.x=W/2;p.y=H*.55;p.vx=p.vy=0}});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);cv.addEventListener('pointermove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;mouse.active=true});document.querySelectorAll('[data-k]').forEach(b=>{b.addEventListener('pointerdown',e=>{keys[b.dataset.k]=true;b.setPointerCapture(e.pointerId)});b.addEventListener('pointerup',()=>keys[b.dataset.k]=false);b.addEventListener('pointercancel',()=>keys[b.dataset.k]=false)});
+function lerp(a,b,k){return a+(b-a)*Math.min(1,k)}function wrap(a){return Math.atan2(Math.sin(a),Math.cos(a))}function line(x1,y1,x2,y2,w,c){g.strokeStyle=c;g.lineWidth=w;g.lineCap='round';g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke()}function poly(points,fill,stroke){g.beginPath();points.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();g.fillStyle=fill;g.fill();if(stroke){g.strokeStyle=stroke;g.lineWidth=1.6;g.stroke()}}function oval(x,y,rx,ry,c){g.fillStyle=c;g.beginPath();g.ellipse(x,y,rx,ry,0,0,Math.PI*2);g.fill()}
+function drawRoy(){
+ g.save();g.translate(p.x,p.y);let speed=Math.hypot(p.vx,p.vy),moving=Math.min(1,speed/135),run=speed>185;let front=Math.cos(p.face-Math.PI/2),side=Math.sin(p.face-Math.PI/2),cycle=p.stride,step=Math.sin(cycle),opp=Math.sin(cycle+Math.PI),bob=moving*(run?2.8:1.8)*Math.abs(Math.sin(cycle)),sw=side*.7;let sway=Math.sin(t*4)*.45;
+ // Ground contact, dynamic foot shadows
+ oval(0,5,29+speed*.02,10,'#0009');oval(-12+step*7*moving,4,10,4,'#03151a');oval(12+opp*7*moving,4,10,4,'#03151a');
+ g.translate(0,-bob);g.rotate(p.lean*.065);
+ // Boots and independent leg joints, visible even in rear view
+ for(let i=0;i<2;i++){let s=i?1:-1,ph=i?opp:step,footX=s*11+ph*12*moving,footY=-3+Math.max(0,-ph)*7*moving,hipX=s*9;
+ line(hipX,-35,hipX+ph*6*moving,-19,12,'#18242d');line(hipX+ph*6*moving,-19,footX,footY-3,10,'#27343f');line(hipX+ph*6*moving,-19,footX,footY-3,3,'#425361');oval(footX+side*2,footY,8,4,'#0c151c');line(footX-4,footY,footX+5,footY,2,'#647583');}
+ // Two coat tails with spring-delayed wind response
+ for(let i=0;i<2;i++){let s=i?1:-1,wind=p.coat*.42+sway*.4;poly([[s*2,-48],[s*20,-43],[s*(25+Math.abs(wind)*3)+wind,-8+Math.abs(wind)*3],[s*9+wind*1.5,-17]],i?'#263f49':'#1a333e','#3b6570');line(s*15,-38,s*15+wind*.7,-18,1,'#4c7881');}
+ // Torso and tactical shoulder guards
+ poly([[-18,-65],[-22,-47],[-14,-31],[15,-31],[22,-48],[18,-65]],'#1a2c35','#446471');
+ poly([[-18,-65],[0,-70],[18,-65],[12,-43],[-12,-43]],'#273b45','#526c78');line(-12,-43,12,-43,3,'#0e2028');line(0,-65,0,-39,2,'#6b8b95');
+ // Pouches and waist belt
+ line(-15,-37,15,-37,5,'#101c24');for(let i=-1;i<=1;i++)poly([[i*10-3,-40],[i*10+4,-40],[i*10+4,-33],[i*10-3,-33]],'#46525a','#111b20');
+ // Arms with counter-swing and wrist terminal
+ for(let i=0;i<2;i++){let s=i?1:-1,ph=i?step:opp,arm=s*(24+Math.abs(ph)*3*moving),elbowY=-47+ph*8*moving,handY=-31+ph*13*moving;line(s*18,-61,arm,elbowY,11,'#243a45');line(arm,elbowY,s*24+ph*4*moving,handY,9,'#172832');oval(s*24+ph*4*moving,handY,5,5,'#475763');if(i===0){g.shadowColor='#31e5c9';g.shadowBlur=13;line(s*24-4,handY,s*24+4,handY,4,'#54ffe0');g.shadowBlur=0;}}
+ // Collar, head with 8-direction face interpolation
+ poly([[-14,-68],[-10,-79],[10,-79],[14,-68],[8,-64],[-8,-64]],'#111f2a','#4c6e79');oval(sw*4,-83,14,16,'#202f39');
+ poly([[-13+sw*4,-90],[-7+sw*4,-100],[8+sw*4,-100],[14+sw*4,-90],[11+sw*4,-82],[-11+sw*4,-82]],'#283842','#536873');
+ let forward=Math.sin(p.face),eyeSide=Math.cos(p.face),eyeVisibility=Math.max(0,(forward+1)/2); // camera-down is front
+ g.save();g.globalAlpha=eyeVisibility;g.shadowColor='#54ffd8';g.shadowBlur=15;line(-9+sw*5,-85,9+sw*5,-85,5,'#69ffe3');g.restore();
+ // Back-of-head illuminated seam, stronger when facing away
+ g.save();g.globalAlpha=1-eyeVisibility;line(sw*3,-98,sw*3,-85,3,'#5b7b87');g.restore();
+ // breathing and HUD emitter
+ g.shadowColor='#38e7c8';g.shadowBlur=12;oval(0,-56+Math.sin(t*2.6)*.8,2,3,'#6cf8d8');g.shadowBlur=0;
+ g.restore();
+}
+function loop(n){let dt=Math.min(.04,(n-last)/1000);last=n;t+=dt;let ix=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0),iy=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0),m=Math.hypot(ix,iy)||1;ix/=m;iy/=m;let running=keys.shift;let target=running?265:155;let accel=1-Math.exp(-dt*12);p.vx=lerp(p.vx,ix*target,accel);p.vy=lerp(p.vy,iy*target,accel);if(keys[' ']&&p.dash<=0&&Math.hypot(ix,iy)>.1){p.dash=.22;p.vx+=ix*450;p.vy+=iy*450}p.dash=Math.max(0,p.dash-dt);p.x=Math.max(45,Math.min(W-45,p.x+p.vx*dt));p.y=Math.max(130,Math.min(H-25,p.y+p.vy*dt));let v=Math.hypot(p.vx,p.vy);if(v>7)p.stride+=dt*(running?15:10)*Math.min(1,v/120);let facing=mouse.active?Math.atan2(mouse.y-p.y,mouse.x-p.x):v>15?Math.atan2(p.vy,p.vx):p.face;p.face+=wrap(facing-p.face)*Math.min(1,dt*10);p.lean=lerp(p.lean,(p.vx*iy-p.vy*ix)/180,dt*8);p.coat=lerp(p.coat,v/90,dt*4);
+ g.clearRect(0,0,W,H);g.fillStyle='#080f19';g.fillRect(0,0,W,H);
+ const grid=80,ox=(p.x*.12)%grid,oy=(p.y*.12)%grid;g.strokeStyle='#153039';g.lineWidth=1;for(let x=ox;x<W;x+=grid){g.beginPath();g.moveTo(x,0);g.lineTo(x,H);g.stroke()}for(let y=oy;y<H;y+=grid){g.beginPath();g.moveTo(0,y);g.lineTo(W,y);g.stroke()}
+ for(let i=0;i<11;i++){let x=(i*223+90)%W,y=(i*179+100)%H;oval(x,y,3,3,i%2?'#25bdb4':'#b75a6b')}
+ let halo=g.createRadialGradient(p.x,p.y-45,15,p.x,p.y-45,220);halo.addColorStop(0,'#1b666b39');halo.addColorStop(1,'#0c172000');g.fillStyle=halo;g.fillRect(p.x-230,p.y-280,460,460);
+ drawRoy();g.fillStyle='#5caaa5';g.font='12px monospace';g.fillText('ROY // MOTION RIG 2.5',16,H-23);g.textAlign='right';g.fillText(Math.round(v)+' px/s  |  '+(running?'RUN':'WALK')+'  |  8-DIRECTION',W-16,H-23);g.textAlign='left';requestAnimationFrame(loop)}requestAnimationFrame(loop);
+</script></body></html>
