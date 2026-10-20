@@ -1,0 +1,14 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#050b13"><title>NEON REQUIEM — HELIX 2.4</title><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#04080e;color:#9ef9d4;font:14px monospace}#screen{width:100%;height:100%;border:0;display:block}#status{position:fixed;inset:0;display:grid;place-items:center;text-align:center;padding:25px;white-space:pre-line}</style></head><body><div id="status">NEON REQUIEM // HELIX
+ЗАГРУЗКА BUILD 2.4...</div><script>
+(async()=>{
+try{
+ const [game,patch]=await Promise.all([fetch('./index.html?base=23',{cache:'no-store'}),fetch('./v24-patch.js',{cache:'no-store'})]);
+ if(!game.ok||!patch.ok)throw Error('Не удалось загрузить игровые файлы');
+ let source=await game.text(),code=await patch.text();
+ if(!source.includes('</body>')||!source.includes('function illustratedLab'))throw Error('Несовместимая базовая сборка');
+ source=source.replace('</body>','<script>'+code.replaceAll('</scr'+'ipt>','')+'</scr'+'ipt></body>');
+ const frame=document.createElement('iframe');frame.id='screen';frame.title='NEON REQUIEM 2.4';frame.allow='fullscreen';frame.srcdoc=source;
+ document.getElementById('status').remove();document.body.appendChild(frame);
+}catch(e){document.getElementById('status').textContent='ОШИБКА ЗАГРУЗКИ 2.4\n'+e.message+'\nПопробуйте обновить страницу.';console.error(e)}
+})();
+</script></body></html>
