@@ -4,7 +4,19 @@
 'use strict';
 const canvas=document.getElementById('game'),ctx=canvas.getContext('2d',{alpha:false});const $=id=>document.getElementById(id);let W=0,H=0,dpr=1,scale=1,originX=0,originY=0,now=0,last=0,active=false,win=false,dead=false,frame=0,shake=0,noticeUntil=0;let boss=null,hackBeams=[],p,foes=[],bullets=[],particles=[],sparks=[],decor=[],afterimages=[],kills=0,spawnTimer=0,terminal=false;const targetKills=18, world={w:2200,h:1700};
 const helixWalls=[{x:750,y:175,w:160,h:235},{x:1780,y:710,w:170,h:240},{x:1130,y:870,w:155,h:215},{x:1040,y:410,w:210,h:95},{x:360,y:920,w:200,h:100},{x:1660,y:1180,w:220,h:100},{x:270,y:570,w:125,h:78},{x:560,y:880,w:125,h:78},{x:980,y:920,w:125,h:78},{x:1520,y:400,w:125,h:78},{x:1880,y:380,w:125,h:78},{x:1940,y:1120,w:125,h:78}];
-function helixBlocked(x,y,r=17){return helixWalls.some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h)}
+// HELIX structural collision: bulkheads, pillars, cryopods and narrow passages.
+const helixStructure=[
+{x:690,y:170,w:34,h:230,type:'wall'},{x:690,y:485,w:34,h:250,type:'wall'},
+{x:1430,y:175,w:36,h:205,type:'wall'},{x:1430,y:490,w:36,h:260,type:'wall'},
+{x:1480,y:970,w:330,h:36,type:'wall'},{x:1910,y:970,w:215,h:36,type:'wall'},
+{x:735,y:740,w:215,h:34,type:'wall'},{x:1060,y:740,w:280,h:34,type:'wall'},
+{x:315,y:340,w:48,h:48,type:'pillar'},{x:580,y:345,w:48,h:48,type:'pillar'},
+{x:890,y:580,w:48,h:48,type:'pillar'},{x:1320,y:580,w:48,h:48,type:'pillar'},
+{x:1590,y:1050,w:54,h:54,type:'pillar'},{x:2050,y:1050,w:54,h:54,type:'pillar'},
+{x:810,y:275,w:72,h:115,type:'pod'},{x:945,y:275,w:72,h:115,type:'pod'},
+{x:1110,y:535,w:85,h:105,type:'pod'},{x:1240,y:535,w:85,h:105,type:'pod'},
+{x:1610,y:840,w:125,h:65,type:'console'},{x:1820,y:1080,w:125,h:65,type:'console'}];
+function helixBlocked(x,y,r=17){return helixWalls.concat(helixStructure).some(o=>x+r>o.x&&x-r<o.x+o.w&&y+r>o.y&&y-r<o.y+o.h)}
 function helixMove(o,dx,dy,r=17){let nx=clamp(o.x+dx,70,world.w-70);if(!helixBlocked(nx,o.y,r))o.x=nx;let ny=clamp(o.y+dy,70,world.h-70);if(!helixBlocked(o.x,ny,r))o.y=ny}
 let helixSector=0,helixSectorName=['ПЕРИМЕТР','ИНДУСТРИАЛЬНЫЙ МОСТ','НЕЙРОЛАБОРАТОРИЯ','РЕАКТОР'];
 function helixStage(){let sector=p.x>1500&&p.y>750?3:p.y>980?1:p.x>720?2:0;if(sector!==helixSector){helixSector=sector;alertMsg('HELIX // '+helixSectorName[sector],2);burst(p.x,p.y,sector===3?'#ff6677':'#67e6d5',18,95)}if(sector===3&&boss){boss.phase+=.016;if(boss.hp<boss.max*.55&&Math.random()<.006)spawnEnemy()}}
@@ -326,7 +338,7 @@ function environmentDetails(){
  }
  ctx.restore();
 }
-function helixZones(){ctx.save();const zones=[{x:80,y:180,w:610,h:650,c:'#50c9cf',name:'01 // SECURITY'},{x:350,y:1020,w:1110,h:330,c:'#e3a45b',name:'02 // CATWALKS'},{x:740,y:120,w:720,h:790,c:'#59e6b4',name:'03 // NEURAL LAB'},{x:1480,y:740,w:650,h:660,c:'#ff657b',name:'04 // REACTOR'}];for(const z of zones){ctx.strokeStyle=z.c+'55';ctx.lineWidth=5;ctx.strokeRect(z.x,z.y,z.w,z.h);ctx.fillStyle=z.c+'11';ctx.fillRect(z.x,z.y,z.w,z.h);ctx.fillStyle=z.c;ctx.font='bold 17px monospace';ctx.fillText(z.name,z.x+22,z.y+35);for(let k=0;k<z.w;k+=100){rect(z.x+k,z.y+z.h-12,52,5,z.c)}}for(const o of helixWalls){rect(o.x+16,o.y+17,o.w,o.h,'#00000066');ctx.strokeStyle='#91c8d366';ctx.lineWidth=2;ctx.strokeRect(o.x,o.y,o.w,o.h)}ctx.restore()}
+function helixZones(){ctx.save();const zones=[{x:80,y:180,w:610,h:650,c:'#50c9cf',name:'01 // SECURITY'},{x:350,y:1020,w:1110,h:330,c:'#e3a45b',name:'02 // CATWALKS'},{x:740,y:120,w:720,h:790,c:'#59e6b4',name:'03 // NEURAL LAB'},{x:1480,y:740,w:650,h:660,c:'#ff657b',name:'04 // REACTOR'}];for(const z of zones){ctx.strokeStyle=z.c+'55';ctx.lineWidth=5;ctx.strokeRect(z.x,z.y,z.w,z.h);ctx.fillStyle=z.c+'09';ctx.fillRect(z.x,z.y,z.w,z.h);ctx.fillStyle=z.c;ctx.font='bold 17px monospace';ctx.fillText(z.name,z.x+22,z.y+35);for(let k=0;k<z.w;k+=100)rect(z.x+k,z.y+z.h-12,52,5,z.c)}for(const o of helixWalls.concat(helixStructure)){let h=o.type==='wall'?80:o.type==='pillar'?95:o.type==='pod'?65:40;ctx.fillStyle='#0009';ctx.fillRect(o.x+20,o.y+18,o.w,o.h);ctx.fillStyle=o.type==='pod'?'#275e6b':o.type==='console'?'#234354':'#2b3d4b';ctx.fillRect(o.x,o.y-h,o.w,o.h+h);ctx.fillStyle='#101e2c';ctx.fillRect(o.x+o.w-12,o.y-h,12,o.h+h);ctx.fillStyle='#526d7a';ctx.beginPath();ctx.moveTo(o.x,o.y-h);ctx.lineTo(o.x+20,o.y-h-20);ctx.lineTo(o.x+o.w+20,o.y-h-20);ctx.lineTo(o.x+o.w,o.y-h);ctx.fill();ctx.strokeStyle='#8ddce099';ctx.lineWidth=2;ctx.strokeRect(o.x,o.y-h,o.w,o.h+h);ctx.fillStyle=o.type==='pod'?'#63ffe1':o.type==='console'?'#f9b773':'#64aab5';ctx.fillRect(o.x+7,o.y-h+12,Math.max(4,o.w-22),5);ctx.fillStyle='#b8f7ff';if(o.type==='pod'){ctx.fillRect(o.x+12,o.y-h+30,o.w-24,18);ctx.fillStyle='#73e6c144';ctx.fillRect(o.x+12,o.y-h+53,o.w-24,28)}}ctx.restore()}
 function illustratedLab(){
  // HELIX procedural environment: all structures are built from world-space geometry.
  ctx.save();
