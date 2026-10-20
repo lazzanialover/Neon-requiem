@@ -310,34 +310,83 @@ function environmentDetails(){
  ctx.restore();
 }
 function illustratedLab(){
- // Sector boundaries: floor inlays, containment zones and navigational markers.
+ // HELIX procedural environment: all structures are built from world-space geometry.
  ctx.save();
- for(const [x,y,w,h,name,color] of [[150,350,580,410,'A // BIOSECURITY','#27b9bd'],[820,330,650,440,'B // RESEARCH','#e19c53'],[1520,830,540,510,'C // CORE','#e6556b']]){
-   ctx.strokeStyle=color+'66';ctx.lineWidth=3;ctx.setLineDash([22,12]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);
-   rect(x+13,y+12,195,30,'#06151dcc');rect(x+17,y+15,4,24,color);
-   ctx.font='bold 15px monospace';ctx.fillStyle=color;ctx.fillText(name,x+30,y+33);
-   for(let i=0;i<4;i++){rect(x+20+i*30,y+h-22,17,4,color+'88')}
+ const R=(x,y,w,h,c)=>rect(x,y,w,h,c);
+ const beam=(x,y,w,h)=>{R(x+8,y+11,w,h,'#02080d99');R(x,y,w,h,'#314651');R(x+3,y+3,w-6,5,'#69828a');R(x+3,y+h-8,w-6,5,'#101d26')};
+ const label=(s,x,y,color='#91bec3',size=15)=>{ctx.font='bold '+size+'px monospace';ctx.fillStyle=color;ctx.fillText(s,x,y)};
+ const lamp=(x,y,color='#40d8cf')=>{glow(x,y,64,color+'35');R(x-12,y-3,24,6,'#06141a');R(x-8,y-2,16,3,color)};
+ // Functional-looking containment bays and separated research sectors.
+ for(const [x,y,w,h,n,c] of [[140,315,570,445,'BIOSECURITY','#35bfc0'],[825,320,630,445,'RESEARCH','#dba35c'],[1520,805,560,530,'REACTOR','#e76578']]){
+  R(x,y,w,h,'#06121b75');ctx.strokeStyle=c+'77';ctx.lineWidth=4;ctx.strokeRect(x,y,w,h);
+  for(let k=0;k<Math.floor(w/90);k++){R(x+12+k*90,y+7,55,5,'#536a73');R(x+12+k*90,y+h-11,55,5,'#31464e')}
+  R(x+18,y+19,200,31,'#091b26');R(x+21,y+22,5,25,c);label('HELIX // '+n,x+35,y+42,c,14);
  }
- ctx.restore();
- const elements=[
- ['door',170,125,255,178],['tank',740,145,195,215],['console',1040,400,220,185],
- ['rail',930,1210,265,150],['tank',1750,720,200,210],
- ['door',1710,117,250,175],['console',340,1050,215,185],
- ['rail',1270,720,260,148]
- ];
- for(const [name,x,y,w,h] of elements){
-  let im=helixArt[name];if(im&&im.complete&&im.naturalWidth){
-   ctx.save();ctx.globalAlpha=.93;
-   ctx.fillStyle='#01080dbb';ctx.fillRect(x+9,y+11,w,h);
-   ctx.drawImage(im,x,y,w,h);ctx.restore();
-  }
+ // Elevated industrial catwalk with continuous walkable-looking deck, support beams and rails.
+ function bridge(x,y,w,h){
+  R(x+11,y+20,w,h,'#01080cb0');
+  R(x,y,w,h,'#1c333d');R(x+5,y+5,w-10,h-10,'#344b52');
+  for(let xx=x+12;xx<x+w-10;xx+=26){R(xx,y+9,3,h-18,'#152832');R(xx+5,y+12,15,h-24,'#425a60')}
+  R(x,y,w,7,'#82969b');R(x,y+h-7,w,7,'#7a898b');
+  for(let xx=x+10;xx<x+w;xx+=64){R(xx,y-23,6,27,'#718b90');R(xx,y+h-4,6,26,'#607981');R(xx+12,y+13,25,5,'#b88c54')}
+  R(x,y-23,w,5,'#577780');R(x,y+h+18,w,5,'#4b6d74');
+  for(let xx=x+20;xx<x+w;xx+=100){R(xx,y+h-4,46,4,'#d5a55a')}
  }
- // Directional pools of emergency lighting, with no tiled screenshot background.
- for(const [x,y,r,c] of [[285,290,155,'#fc343226'],[840,280,155,'#18e6e829'],[1850,250,180,'#f34d422b'],[1250,850,180,'#13bfe22b'],[520,1350,150,'#e6474820']]){
- glow(x,y,r,c)}
- ctx.save();ctx.font='bold 25px monospace';ctx.fillStyle='#d65e68';
- ctx.fillText('HELIX / LAB 03',110,85);ctx.fillStyle='#5a7b81';ctx.font='15px monospace';
- ctx.fillText('CONTAINMENT DIVISION — AUTHORIZED PERSONNEL ONLY',112,105);
+ // Bridge segments use level coordinates, never screenshot overlays.
+ bridge(350,1115,1050,105);
+ bridge(1320,690,550,95);
+ // Stairs and access ramps: repeated actual geometry, not a pasted staircase picture.
+ function stairs(x,y,steps){for(let i=0;i<steps;i++){let yy=y+i*23;R(x+i*7,yy,170-i*14,21,'#233943');R(x+i*7+3,yy+3,164-i*14,4,'#69818a');R(x+i*7+4,yy+15,150-i*14,4,'#b38c52')}R(x-6,y-16,5,steps*23+25,'#5a7279');R(x+174,y-16,5,steps*23+25,'#5a7279')}
+ stairs(1420,910,7);
+ // Cryogenic robot pods with constructed shells, articulated robots and animated glass.
+ function pod(x,y,w,h,id){
+  const pulse=(Math.sin(now*2.3+id)*.5+.5);
+  R(x+11,y+18,w,h,'#01070caa');
+  R(x,y,w,h,'#203942');R(x+8,y+8,w-16,h-16,'#071b27');
+  glow(x+w/2,y+h/2,w*.72,'#27e9db25');
+  R(x+16,y+21,w-32,h-51,'#124651');
+  for(let j=0;j<8;j++){R(x+19+j*(w-40)/8,y+27,2,h-66,'#3c8c8b35')}
+  const cx=x+w/2,cy=y+h*.52;
+  // Robot silhouette: head, neck, torso, joints, arms and legs.
+  R(cx-13,cy-64,26,22,'#354c55');R(cx-9,cy-60,18,7,'#9c4653');R(cx-5,cy-55,10,4,'#ff6978');
+  R(cx-5,cy-42,10,8,'#7a9398');R(cx-22,cy-35,44,51,'#425a63');
+  R(cx-14,cy-27,28,30,'#182f39');R(cx-7,cy-20,14,13,'#46ebcf');
+  for(const side of [-1,1]){R(cx+side*24-5,cy-30,11,17,'#70858b');R(cx+side*30-5,cy-10,9,33,'#2e4953');R(cx+side*11-6,cy+16,12,40,'#425b65');R(cx+side*11-8,cy+52,17,9,'#76868b')}
+  R(x+11,y+12,8,h-24,'#68848c');R(x+w-19,y+12,8,h-24,'#68848c');
+  R(x+20,y+15,w-40,7,'#8ab8b9');R(x+18,y+h-26,w-36,12,'#20333c');
+  ctx.fillStyle='rgba(94,239,225,'+(.07+pulse*.13)+')';ctx.fillRect(x+20,y+23,w-40,h-55);
+  R(x+27+pulse*(w-80),y+26,5,h-65,'#a6fff51c');
+  for(let k=0;k<4;k++)R(x+27+k*27,y+h-22,15,4,k===id%4?'#fa6876':'#5affcb');
+  label('UNIT 0'+id,x+16,y-9,'#7fdcd3',12);
+ }
+ pod(750,175,160,235,1);pod(1780,710,170,240,2);pod(1130,870,155,215,3);
+ // Research consoles: multiple layers and animated monitor telemetry.
+ function consoleUnit(x,y,w=170){
+  R(x+12,y+70,w,36,'#030a0d99');R(x,y+60,w,35,'#253b45');R(x+8,y+70,w-16,13,'#101e27');
+  for(let j=0;j<3;j++){let xx=x+9+j*(w-15)/3;R(xx,y+4,Math.floor((w-26)/3),55,'#344e58');R(xx+5,y+9,Math.floor((w-42)/3),41,'#072b39');
+   for(let k=0;k<6;k++)R(xx+10+k*5,y+38-Math.sin(now*2+k+j)*8,3,6+k%3*4,k%3?'#43bfc3':'#d45b6e');
+  }R(x+12,y+85,w-24,4,'#bf745a');
+ }
+ consoleUnit(1040,410,210);consoleUnit(360,920,200);consoleUnit(1660,1180,220);
+ // Pipes and overhead conduits tie sectors together.
+ for(const [x,y,w] of [[140,260,1150],[1010,260,1010],[280,1060,1000],[1390,1400,650]]){
+  R(x,y,w,17,'#0b2029');R(x,y+3,w,5,'#637a82');R(x,y+13,w,3,'#a27953');
+  for(let k=0;k<w;k+=145){R(x+k,y-7,13,30,'#41535c');R(x+k+4,y-3,4,22,'#91a3a3')}
+ }
+ // Vents, pumps and service cabinets form a dense but readable industrial space.
+ for(const [x,y] of [[270,570],[560,880],[980,920],[1520,400],[1880,380],[1940,1120]]){
+  R(x+9,y+12,125,78,'#030a10a8');R(x,y,125,78,'#354a54');R(x+7,y+7,111,63,'#0d2430');
+  for(let j=0;j<8;j++){R(x+13+j*12,y+14,6,46,'#294751');R(x+14+j*12,y+18,3,31,'#49707b')}
+  R(x+10,y+64,105,5,'#bd8a52');lamp(x+110,y+12,'#e45c6d');
+ }
+ for(const [x,y] of [[240,300],[650,300],[980,790],[1440,740],[1880,1030],[600,1280]])lamp(x,y);
+ // Steam bursts and scanner sweeps.
+ for(const [x,y,i] of [[480,860,0],[1050,290,1],[1600,1040,2],[1920,630,3]]){
+  const v=(now*.7+i*.25)%1;ctx.save();ctx.globalAlpha=(1-v)*.24;
+  ctx.fillStyle='#a9e8e5';ctx.beginPath();ctx.ellipse(x+Math.sin(now+i)*12,y-v*65,13+v*22,6+v*20,0,0,Math.PI*2);ctx.fill();ctx.restore();
+ }
+ label('HELIX // NEURAL CONTAINMENT',140,85,'#9dc5c6',23);
+ label('RESTRICTED AREA — SECURITY LEVEL 05',142,111,'#e57880',13);
  ctx.restore();
 }
 function drawSpecialEnemy(f){
