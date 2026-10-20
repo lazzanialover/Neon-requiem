@@ -124,7 +124,7 @@ function actor(x,y,a,enemy=false,heavy=false,flash=0){
  }
  ctx.save();ctx.translate(x,y);
 
- const dir=p.dir||'front',img=royArt[dir]||royArt.front;
+ const dir=p.dir||'front',img=royArt[dir==='left'?'right':dir==='right'?'left':dir]||royArt.front;
  const moving=!!(p.moving&&active),cycle=p.walk||0;
  const step=moving?Math.sin(cycle):0,other=moving?Math.cos(cycle):0;
  ctx.fillStyle='#010609ad';ctx.beginPath();ctx.ellipse(0,20,20,7,0,0,Math.PI*2);ctx.fill();
