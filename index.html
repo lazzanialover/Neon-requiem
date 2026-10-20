@@ -1,4 +1,4 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#050b13"><title>NEON REQUIEM 2.3 — HELIX BREACH</title><style>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#050b13"><title>NEON REQUIEM 2.4 — ROY WALK PATCH</title><style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050811;color:#e8f3f7;font-family:system-ui,-apple-system,sans-serif;touch-action:none}canvas{display:block;width:100%;height:100%;touch-action:none;image-rendering:pixelated}#ui{position:fixed;inset:0;pointer-events:none}#top{position:absolute;top:max(12px,env(safe-area-inset-top));left:15px;right:15px;display:flex;justify-content:space-between;gap:10px;align-items:flex-start}#logo{font-size:15px;font-weight:900;letter-spacing:3px;text-shadow:0 0 12px #28dfff;color:#c7faff}#sub{font-size:9px;color:#68a4b6;letter-spacing:2px;margin-top:2px}#mission{font-size:10px;color:#b8cbd2;text-align:right;max-width:52%;line-height:1.5;text-shadow:0 2px 3px #000}#mission b{color:#ffb98d}#bottom{position:absolute;bottom:max(13px,env(safe-area-inset-bottom));left:16px;right:16px;display:flex;align-items:end;justify-content:space-between;gap:8px}#bars{width:170px;max-width:46vw}#bars label{font-size:9px;letter-spacing:2px;color:#b1cbd5} .bar{height:9px;background:#14222c;border:1px solid #3b5862;margin:4px 0 7px;position:relative;box-shadow:0 0 8px #000}.bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#9f1f35,#fa5967);transition:width .12s}.bar.energy i{background:linear-gradient(90deg,#086b9b,#52dfff)}#ammo{font-size:11px;color:#cde4eb;letter-spacing:2px;text-shadow:0 2px 3px #000}#mobile{position:absolute;inset:0;pointer-events:none}#stick{position:absolute;bottom:max(42px,env(safe-area-inset-bottom) + 26px);left:24px;width:126px;height:126px;border-radius:50%;border:2px solid #5d99a27a;background:#152e3a66;pointer-events:auto;touch-action:none;display:none;box-shadow:0 0 25px #0ff2}#nub{position:absolute;width:54px;height:54px;left:34px;top:34px;border-radius:50%;border:2px solid #8df2e8b3;background:#3b99a44f;box-shadow:0 0 16px #24c7df66;transform:translate(0,0)}.act{position:absolute;width:69px;height:69px;border:1px solid #7fc4cb8a;border-radius:15px;color:#d8fcff;background:#10303bb8;pointer-events:auto;touch-action:none;font-weight:900;letter-spacing:1px;box-shadow:0 0 16px #00dfff24;display:none}.act:active{background:#24778a}.act small{display:block;font-size:9px;color:#9cc4cc;font-weight:500}.act.fire{right:22px;bottom:max(70px,env(safe-area-inset-bottom) + 58px);width:83px;height:83px;border-color:#ff936f;color:#ffb18f;background:#4b2029b8}.act.dash{right:112px;bottom:max(35px,env(safe-area-inset-bottom) + 23px)}.act.pulse{right:112px;bottom:max(118px,env(safe-area-inset-bottom) + 106px)}#intro{position:fixed;inset:0;z-index:10;background:radial-gradient(ellipse at 50% 38%,#142635e8,#02050bf5 75%);display:flex;justify-content:center;align-items:center;padding:24px;overflow:auto}#card{width:min(460px,100%);border:1px solid #2b6474;background:linear-gradient(135deg,#10212ae8,#070c15f5);padding:27px 23px;box-shadow:0 0 80px #00bfff21,inset 0 0 30px #00bfff0a;position:relative}#card:before{content:'';position:absolute;top:-2px;left:18px;width:80px;height:3px;background:#63e8f3;box-shadow:0 0 14px #2eeeff}#card .eyebrow{font-size:10px;color:#ff9b77;letter-spacing:3px}h1{font-size:clamp(29px,8vw,43px);line-height:1.05;margin:14px 0 8px;letter-spacing:3px;color:#e8faff;text-shadow:0 0 26px #00ccff75}#card p{color:#a9c4cf;font-size:13px;line-height:1.7}#card strong{color:#e4f5f9}#start{display:block;width:100%;border:1px solid #67f4f4;background:#0b6374;color:#eaffff;padding:16px 12px;font-size:13px;font-weight:900;letter-spacing:2px;margin-top:23px;cursor:pointer;box-shadow:0 0 20px #00cfe836;touch-action:manipulation}#start:active{background:#188ea4}#hint{font-size:10px!important;color:#6f9dab!important;margin-bottom:0}#notice{position:absolute;top:23%;width:100%;text-align:center;font-size:12px;letter-spacing:3px;color:#aafaff;text-shadow:0 0 12px #2cf2ff,0 2px 4px #000;opacity:0;transition:opacity .2s}#notice.show{opacity:1}#debug{position:fixed;top:50%;left:8%;right:8%;background:#300;color:#fff;z-index:20;display:none;padding:12px;font-size:12px}@media(pointer:coarse),(max-width:900px){#stick,.act{display:block}#bottom{bottom:max(12px,env(safe-area-inset-bottom));left:15px}#bars{width:120px}#ammo{display:none}#logo{font-size:12px}#mission{font-size:9px}}
 </style></head><body><canvas id="game"></canvas><div id="ui"><div id="top"><div><div id="logo">NEON REQUIEM</div><div id="sub">REQUIEM // РОЙ // BUILD 2.1 // ENEMY ART</div></div><div id="mission">ЦЕЛЬ: <b id="objective">ПРОРВАТЬ ОБОРОНУ HELIX</b><br><span id="counter">ОХРАНА: 0 / 18</span></div></div><div id="notice"></div><div id="bottom"><div id="bars"><label>ЗДОРОВЬЕ</label><div class="bar"><i id="hpbar"></i></div><label>ЭНЕРГИЯ</label><div class="bar energy"><i id="enbar"></i></div></div><div id="ammo">КПК // <span id="shots">∞</span></div></div><div id="mobile"><div id="stick"><div id="nub"></div></div><button class="act fire" id="fire">ВЗЛОМ<small>ПРОТОКОЛА</small></button><button class="act pulse" id="pulse">ВЗЛОМ<small>НЕЙРОСЕТИ</small></button><button class="act dash" id="dash">РЫВОК<small>СЛЕД</small></button></div></div><div id="intro"><div id="card"><div class="eyebrow">REQUIEM // ЗАСЕКРЕЧЕНО</div><h1 id="heading">РОЙ<br>NEURAL BREACH</h1><p id="story"><strong>ОПЕРАЦИЯ 01: ПЕРИМЕТР</strong><br>Проникни на технический объект HELIX. Нейтрализуй охрану и доберись до терминала доступа.<br><br>БОЕВОЙ ТЕСТ: оперативник с анимацией шага, AR-очками и КПК. Дронов больше нет. Используй нейроразряд, заражение и рывок.</p><button id="start" type="button">НАЧАТЬ ОПЕРАЦИЮ →</button><p id="hint">iPhone: джойстик слева, КПК / нейровзлом / рывок справа. Mac: WASD, ЛКМ — нейроудар, E — заражение, ПРОБЕЛ — рывок, Shift — бег, P — пауза.</p></div></div><div id="debug"></div><script>
 'use strict';
@@ -123,52 +123,27 @@ function actor(x,y,a,enemy=false,heavy=false,flash=0){
   ctx.restore();return;
  }
  ctx.save();ctx.translate(x,y);
+
  const dir=p.dir||'front',img=royArt[dir]||royArt.front;
- const moving=p.moving&&active,cycle=p.walk||0;
- const gait=moving?Math.sin(cycle):0;
- const bounce=moving?Math.abs(Math.cos(cycle))*1.5:Math.sin(now*2.2)*.35;
- const lean=p.dashTime>0?(dir==='right'?.10:dir==='left'?-.10:0):moving?gait*.024:0;
+ const moving=!!(p.moving&&active),cycle=p.walk||0;
+ const step=moving?Math.sin(cycle):0,other=moving?Math.cos(cycle):0;
  ctx.fillStyle='#010609ad';ctx.beginPath();ctx.ellipse(0,20,20,7,0,0,Math.PI*2);ctx.fill();
- ctx.rotate(lean);
- // The rendered directional sprites are genuine cutouts of the approved concept.
- // Small procedural motion is retained until dedicated frame-by-frame sheets are authored.
  if(img.complete&&img.naturalWidth){
-   const drawW=dir==='front'?59:dir==='back'?57:56,drawH=105;
-   const iw=img.naturalWidth,ih=img.naturalHeight;
-   const sx=-drawW/2, sy=-drawH+20-bounce;
-   // Animate the two legs independently from the approved sprite image.
-   // The upper body remains aligned while the feet alternate in a gait cycle.
-   const hip=Math.floor(ih*.695), legH=ih-hip;
-   const upperH=drawH*hip/ih, lowerH=drawH-upperH;
-   const phase=moving?Math.sin(cycle):0;
-   const step=moving?phase*7:0;
-   const rise=moving?Math.max(0,phase)*4:0;
-   // Legs are cropped from the sprite and pivot from the hip.
-   ctx.save();
-   ctx.translate(sx+drawW*.27,sy+upperH);
-   ctx.rotate(moving?phase*.22:0);
-   ctx.drawImage(img,0,hip,iw*.52,legH,-drawW*.27,-1-rise,drawW*.52,lowerH+1);
+  const iw=img.naturalWidth,ih=img.naturalHeight;
+  const dw=dir==='front'?59:dir==='back'?57:56,dh=105;
+  const hip=Math.floor(ih*.695),sx=-dw/2,sy=20-dh-(moving?Math.abs(other)*2:0);
+  for(const left of [false,true]){
+   const lift=moving?Math.max(0,(left?other:-other))*12:0;
+   ctx.save();ctx.translate(sx+dw*(left?.27:.73),sy+dh*.695);
+   ctx.rotate((left?1:-1)*step*.48);
+   ctx.drawImage(img,iw*(left?0:.48),hip,iw*.52,ih-hip,-dw*.26,-lift,dw*.52,dh*.305);
    ctx.restore();
-   ctx.save();
-   ctx.translate(sx+drawW*.74,sy+upperH);
-   ctx.rotate(moving?-phase*.22:0);
-   ctx.drawImage(img,iw*.48,hip,iw*.52,legH,-drawW*.26,-1-(moving?Math.max(0,-phase)*4:0),drawW*.52,lowerH+1);
-   ctx.restore();
-   // Torso and head sway subtly with each stride; coat hem trails movement.
-   ctx.save();
-   ctx.translate(moving?phase*.9:0,moving?-Math.abs(phase)*.5:0);
-   ctx.drawImage(img,0,0,iw,hip,sx,sy,drawW,upperH+1);
-   ctx.restore();
-   if(p.fire>.10){
-     const side=dir==='left'?-1:1;
-     glow(side*19,-28,30,'#32ff9650');
-     ctx.strokeStyle='#7bffc0';ctx.lineWidth=1.2;
-     ctx.strokeRect(side*17-8,-38,16,15);
-     ctx.fillStyle='#62ffb2';ctx.fillRect(side*17-5,-35,10,2);
-   }
- }else{
-   rect(-13,-30,26,47,'#26383b');rect(-11,-42,22,13,'#15242a');rect(-10,-38,20,5,'#48ffab');
- }
+  }
+  ctx.save();ctx.translate(moving?step*1.4:0,0);
+  ctx.drawImage(img,0,0,iw,hip,sx,sy,dw,dh*.695);
+  ctx.restore();
+ }else{rect(-13,-30,26,47,'#26383b');rect(-11,-42,22,13,'#15242a');rect(-10,-38,20,5,'#48ffab')}
+
  ctx.restore();
 
 }
