@@ -1,0 +1,58 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><title>NEON REQUIEM · Roy Animated</title><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#02080d;overflow:hidden}iframe{width:100%;height:100%;border:0}</style></head><body><iframe id="game" src="./index.html" allow="fullscreen"></iframe><script>
+const f=document.getElementById('game');
+f.addEventListener('load',()=>{
+ try{
+ const w=f.contentWindow;
+ w.eval(`
+ (function(){
+ const baseActor=actor;
+ let walkCount=0;
+ actor=function(x,y,a,enemy=false,heavy=false,flash=0){
+ if(enemy){baseActor(x,y,a,enemy,heavy,flash);return}
+ const dir=p.dir||'front',img=royArt[dir]||royArt.front;
+ if(!img||!img.complete||!img.naturalWidth){baseActor(x,y,a,enemy,heavy,flash);return}
+ const moving=!!(p.moving&&active),cycle=p.walk||0;
+ const phase=moving?Math.sin(cycle):0,op=moving?Math.cos(cycle):0;
+ const bob=moving?Math.abs(op)*2.5:Math.sin(now*2)*.3;
+ const iw=img.naturalWidth,ih=img.naturalHeight,dw=dir==='front'?59:dir==='back'?57:56,dh=105;
+ const sx=-dw/2,sy=20-dh-bob;
+ const hip=Math.floor(ih*.69),sh=Math.floor(ih*.28),legH=ih-hip;
+ const shoulderY=sy+dh*sh/ih,hipY=sy+dh*hip/ih;
+ const armH=Math.floor(ih*.37);
+ ctx.save();ctx.translate(x,y);
+ ctx.fillStyle='#010609ad';ctx.beginPath();ctx.ellipse(0,20,20,7,0,0,Math.PI*2);ctx.fill();
+ // Independent legs: opposite hip rotations and alternating foot lift.
+ for(const left of [false,true]){
+   const lx=left?.27:.73,sourceX=left?0:.47;
+   const swing=(left?1:-1)*phase*.38;
+   const lift=moving?Math.max(0,(left?op:-op))*9:0;
+   ctx.save();ctx.translate(sx+dw*lx,hipY);
+   ctx.rotate(swing);
+   ctx.drawImage(img,iw*sourceX,hip,iw*.53,legH,-dw*.27,-lift,dw*.53,dh*legH/ih+1);
+   ctx.restore();
+ }
+ // Coat tails lag behind the hips.
+ ctx.save();ctx.translate(moving?-phase*2.6:0,moving?Math.abs(phase)*1.1:0);
+ ctx.drawImage(img,iw*.17,ih*.53,iw*.66,ih*.23,sx+dw*.17,sy+dh*.53,dw*.66,dh*.23);
+ ctx.restore();
+ // Torso countersways, head and visor retained from original sprite.
+ ctx.save();ctx.translate(moving?phase*1.3:0,0);ctx.rotate(moving?-phase*.04:0);
+ ctx.drawImage(img,0,0,iw,hip,sx,sy,dw,dh*hip/ih);
+ ctx.restore();
+ // Each arm pivots in opposition to the corresponding leg.
+ for(const left of [true,false]){
+   const sourceX=left?0:.77,anchorX=sx+dw*(left?.12:.88);
+   ctx.save();ctx.translate(anchorX,shoulderY+8);
+   ctx.rotate((left?-1:1)*phase*.36);
+   ctx.drawImage(img,iw*sourceX,sh,iw*.23,armH,-dw*.115,-2,dw*.23,dh*armH/ih);
+   ctx.restore();
+ }
+ if(p.fire>.1){ctx.strokeStyle='#6effb6';ctx.lineWidth=1.5;ctx.strokeRect(13,-39,17,14)}
+ ctx.restore();
+ };
+ })();
+ `);
+ w.document.body.setAttribute('data-roy-animation','articulated-v2');
+ }catch(err){const n=document.createElement('div');n.textContent='Ошибка подключения анимации: '+err.message;n.style.cssText='position:fixed;top:0;left:0;background:#300;color:white;padding:10px;z-index:999';document.body.appendChild(n)}
+});
+</script></body></html>
